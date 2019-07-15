@@ -54,23 +54,20 @@ public class RestUtil {
     }
 
     /*
-    ***search query path of first example***
-    It is  equal to "barack obama/videos.json?num_of_videos=4"
-    */
-    public static void createDetailsPath(int detailId) {
-        path = "/" + Integer.toString(detailId);
-    }
-
-    /*
     ***Returns response***
     We send "path" as a parameter to the Rest Assured'a "get" method
     and "get" method returns response of API
     */
-    public static Response getResponse() {
+    public static Response getResponse(String params) {
         //System.out.print("path: " + path +"\n");
-        return RestAssured.get(path + "/");
+        return RestAssured.get(params);
     }
 
+    public static Response setAuth(String userName,String password,String path){
+        return RestAssured.given().auth().preemptive().basic(userName,password)
+                .cookie("user_session","SlncXWJnK8NokLYhmGNLrofoX1wXaU3AXBvNu1ipNBWTtBUu")
+                .get(path);
+    }
     /*
      ***Returns JsonPath object***
      * First convert the API's response to String type with "asString()" method.

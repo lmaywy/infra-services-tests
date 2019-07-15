@@ -15,8 +15,16 @@ public class AppTest {
      */
     @Test
     public void articalDetailShouldReturn200() {
-        RestUtil.setBaseURI("https://blog.csdn.net/");
-        Response response = RestUtil.getResponse();
+        RestUtil.setBaseURI("https://github.com/");
+        Response response = RestUtil.getResponse("");
+        assertEquals(200, response.statusCode());
+        response.body().prettyPrint();
+    }
+
+    @Test
+    public void searchRepoShouldReturn200() {
+        RestUtil.setBaseURI("https://github.com/");
+        Response response = RestUtil.setAuth("lmaywy","Passw0rd13$","search/count?q=specflow&type=Code");
         assertEquals(200, response.statusCode());
         response.body().prettyPrint();
     }
