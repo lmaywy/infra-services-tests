@@ -1,6 +1,8 @@
 package com.baidu.infra.services;
 
 import static org.junit.Assert.assertEquals;
+
+import io.restassured.response.Response;
 import org.junit.Test;
 import utils.RestUtil;
 
@@ -13,10 +15,9 @@ public class AppTest {
      */
     @Test
     public void articalDetailShouldReturn200() {
-        RestUtil.setBaseURI("https://blog.csdn.net");
-        RestUtil.setBasePath("article/details");
-        RestUtil.createDetailsPath(95635775);
-        int statusCode = RestUtil.getResponse().statusCode();
-        assertEquals(200, statusCode);
+        RestUtil.setBaseURI("https://blog.csdn.net/");
+        Response response = RestUtil.getResponse();
+        assertEquals(200, response.statusCode());
+        response.body().prettyPrint();
     }
 }

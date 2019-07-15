@@ -4,7 +4,10 @@ import io.restassured.*;
 import io.restassured.http.*;
 import io.restassured.response.*;
 import io.restassured.path.json.*;
+import java.net.URL;
 
+import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 
 public class RestUtil {
     //Global Setup Variables
@@ -54,8 +57,8 @@ public class RestUtil {
     ***search query path of first example***
     It is  equal to "barack obama/videos.json?num_of_videos=4"
     */
-    public static void createDetailsPath(double detailId) {
-        path = RestAssured.basePath + "/" + detailId;
+    public static void createDetailsPath(int detailId) {
+        path = "/" + Integer.toString(detailId);
     }
 
     /*
@@ -65,7 +68,7 @@ public class RestUtil {
     */
     public static Response getResponse() {
         //System.out.print("path: " + path +"\n");
-        return RestAssured.get(path);
+        return RestAssured.get(path + "/");
     }
 
     /*
@@ -76,5 +79,58 @@ public class RestUtil {
     public static JsonPath getJsonPath(Response res) {
         String resp = res.asString();
         return new JsonPath(resp);
+    }
+
+    public static Response sendpostWithHttp(String surl, String str) throws Exception{
+        String msg=null;
+        URL url = new URL(surl);
+        Response response = given().log().all().
+                header("accept", "application/json").
+                contentType("application/json").
+                body(str).
+                then().
+                when().
+                post(url);
+        response.getBody().prettyPrint();
+
+        return response;
+    }
+    public static ValidatableResponse sendgetWithHttp(String surl, String str) throws Exception{
+        URL url = new URL(surl);
+        ValidatableResponse response = given()
+                .log().all()
+                .queryParam(str)
+                .when()
+                .get(surl)
+                .then()
+                .log().all();
+        return response;
+    }
+    public static Response sendpostWithHttps(String surl, String str) throws Exception{
+        URL url = new URL(surl);
+        useRelaxedHTTPSValidation();
+        Response response = given().log().all().
+                header("accept", "application/json").
+                contentType("application/json").
+                body(str).
+                then().
+                statusCode(200).
+                when().
+                post(url);
+        response.getBody().prettyPrint();
+        return response;
+    }
+    public static ValidatableResponse sendgetWithHttps(String surl, String str) throws Exception{
+        URL url = new URL(surl);
+        useRelaxedHTTPSValidation();
+        ValidatableResponse response = given()
+                .log().all()
+                .queryParam(str)
+                .when()
+                .get(surl)
+                .then()
+                .log().all()
+                .statusCode(200);
+        return response;
     }
 }
