@@ -22,11 +22,14 @@ public class AppTest {
     public void getACCCCases() throws IOException, InterruptedException {
         String baseUrl = "https://www.accc.gov.au";
         String paraPage = "";
-        int count = 0;
+        String ext = ".html";
+
+
         int totalPage = 344;
-        int timeInterval=5;
+        int timeInterval = 3;
 
         for (int i = 0; i < totalPage; i++) {
+            int count = i * 20;
             if (i != 0)
                 paraPage = "?page=" + i;
             RestUtil.setBaseURI(baseUrl);
@@ -39,19 +42,27 @@ public class AppTest {
                 count++;
                 Response article = RestUtil.getResponse(titleLinks.get(j));
                 String fileName = (i + 1) + "-" + count + "_" + titleLinks.get(j).split("/")[2];
-                String content = article.body().asString();
+                String body = article.body().asString();
+                String content = body;
+
+                // only get the cases content
+                Document detail = Jsoup.parse(body);
+                Element ele = detail.getElementById("readspeaker-process");
+                content=ele.outerHtml();
+
+                System.out.println("response code:" + response.statusCode());
                 System.out.println("start to save file:" + fileName);
-                saveFile(content, fileName);
+                saveAs(content, fileName, ext);
             }
             TimeUnit.MINUTES.sleep(timeInterval);
         }
     }
 
 
-    public void saveFile(String content, String fileName)
+    public void saveAs(String content, String fileName, String ext)
             throws IOException {
         String filePath = "c:\\ACCC_Cases\\";
-        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath + fileName + ".html"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath + fileName + ext));
         writer.write(content);
         writer.close();
     }
