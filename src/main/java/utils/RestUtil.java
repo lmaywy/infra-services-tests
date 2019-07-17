@@ -4,10 +4,10 @@ import io.restassured.*;
 import io.restassured.http.*;
 import io.restassured.response.*;
 import io.restassured.path.json.*;
+
 import java.net.URL;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
+import static io.restassured.RestAssured.*;
 
 public class RestUtil {
     //Global Setup Variables
@@ -60,14 +60,13 @@ public class RestUtil {
     */
     public static Response getResponse(String params) {
         //System.out.print("path: " + path +"\n");
-        return RestAssured.get(params);
+        return RestAssured.given().urlEncodingEnabled(false).get(params);
     }
 
-    public static Response setAuth(String userName,String password,String path){
-        return RestAssured.given().auth().preemptive().basic(userName,password)
-                .cookie("user_session","SlncXWJnK8NokLYhmGNLrofoX1wXaU3AXBvNu1ipNBWTtBUu")
-                .get(path);
+    public static Response getResponseWithToken(String userName, String password, String path) {
+        return RestAssured.given().auth().preemptive().basic(userName, password).get(path);
     }
+
     /*
      ***Returns JsonPath object***
      * First convert the API's response to String type with "asString()" method.
@@ -78,8 +77,8 @@ public class RestUtil {
         return new JsonPath(resp);
     }
 
-    public static Response sendpostWithHttp(String surl, String str) throws Exception{
-        String msg=null;
+    public static Response sendpostWithHttp(String surl, String str) throws Exception {
+        String msg = null;
         URL url = new URL(surl);
         Response response = given().log().all().
                 header("accept", "application/json").
@@ -92,7 +91,8 @@ public class RestUtil {
 
         return response;
     }
-    public static ValidatableResponse sendgetWithHttp(String surl, String str) throws Exception{
+
+    public static ValidatableResponse sendgetWithHttp(String surl, String str) throws Exception {
         URL url = new URL(surl);
         ValidatableResponse response = given()
                 .log().all()
@@ -103,7 +103,8 @@ public class RestUtil {
                 .log().all();
         return response;
     }
-    public static Response sendpostWithHttps(String surl, String str) throws Exception{
+
+    public static Response sendpostWithHttps(String surl, String str) throws Exception {
         URL url = new URL(surl);
         useRelaxedHTTPSValidation();
         Response response = given().log().all().
@@ -117,7 +118,8 @@ public class RestUtil {
         response.getBody().prettyPrint();
         return response;
     }
-    public static ValidatableResponse sendgetWithHttps(String surl, String str) throws Exception{
+
+    public static ValidatableResponse sendgetWithHttps(String surl, String str) throws Exception {
         URL url = new URL(surl);
         useRelaxedHTTPSValidation();
         ValidatableResponse response = given()

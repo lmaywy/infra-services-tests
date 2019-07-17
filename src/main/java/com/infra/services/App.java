@@ -1,4 +1,4 @@
-package com.baidu.infra.services;
+package com.infra.services;
 
 /**
  * Hello world!

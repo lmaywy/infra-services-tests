@@ -1,4 +1,4 @@
-package com.baidu.infra.services;
+package com.infra.services;
 
 import io.restassured.response.Response;
 import org.junit.Test;
@@ -10,7 +10,7 @@ public class AppTestWithToken {
     @Test
     public void searchRepoShouldReturn200() {
         RestUtil.setBaseURI("https://github.com/");
-        Response response = RestUtil.setAuth("lmaywy", "Passw0rd13$", "search/count?q=specflow&type=Code");
+        Response response = RestUtil.getResponseWithToken("lmaywy", "Passw0rd13$", "search/count?q=specflow&type=Code");
         assertEquals(200, response.statusCode());
         response.body().prettyPrint();
     }
