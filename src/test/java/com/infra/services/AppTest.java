@@ -8,6 +8,8 @@ import utils.RestUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -55,37 +57,19 @@ public class AppTest {
         String baseUrl = "https://www.accc.gov.au";
         RestUtil.setBaseURI(baseUrl);
 
-        for (int j = 0; j < caseLinks.size(); j++) {
+        for (int j = 601; j < caseLinks.size(); j++) {
             String path = caseLinks.get(j)[0];
             Response article = RestUtil.getResponse(path);
 
             String body = article.body().asString()
-                    .replace("<BR>","\r\n")
-                    .replace("<BR/>","\r\n");
-
+                    .replace("<BR>", "\r\n")
+                    .replace("<BR/>", "\r\n");
             Document detail = Jsoup.parse(body);
-            Element ele = detail.select(".field-type-text-with-summary").get(0);
-            String content = ele.wholeText();
-            String date = detail.getElementsByClass("date-display-single").get(0).text();
-            String title = detail.getElementById("page-title").text();
-            String log = (j + 1) + "_" + title;
 
-            String[] item = new String[15];
-            item[0] = title;
-            item[1] = date;
-            item[2] = content;
+            // download to local
+            FileUtil.saveAs(detail.html(), path.split("/")[2], ".html");
 
-            Elements eleLabels = detail.select(".field-label");
-
-            for (int k = 0; k < eleLabels.size(); k++) {
-                Elements label_values = eleLabels.get(k).nextElementSibling().select(".field-item");
-                item[k + 3] = "";
-                for (int m = 0; m < label_values.size(); m++) {
-                    String text = label_values.get(m).text();
-                    item[k + 3] += text + ";";
-                }
-            }
-            System.out.println("start to save file:" + log);
+            String[] item = getItem(detail);
             data.add(item);
             TimeUnit.MILLISECONDS.sleep(1000);
 
@@ -99,6 +83,31 @@ public class AppTest {
                 FileUtil.writeCSV(data, "c:\\ACCC_Cases\\" + (j / 200) + 1 + "_cases.csv");
             }
         }
+    }
+
+    private String[] getItem( Document detail) throws IOException {
+
+        Element ele = detail.select(".field-type-text-with-summary").get(0);
+        String content = ele.wholeText();
+        String date = detail.getElementsByClass("date-display-single").get(0).text();
+        String title = detail.getElementById("page-title").text();
+
+        String[] item = new String[15];
+        item[0] = title;
+        item[1] = date;
+        item[2] = content;
+
+        Elements eleLabels = detail.select(".field-label");
+
+        for (int k = 0; k < eleLabels.size(); k++) {
+            Elements label_values = eleLabels.get(k).nextElementSibling().select(".field-item");
+            item[k + 3] = "";
+            for (int m = 0; m < label_values.size(); m++) {
+                String text = label_values.get(m).text();
+                item[k + 3] += text + ";";
+            }
+        }
+        return item;
     }
 
     @Test
@@ -169,4 +178,21 @@ public class AppTest {
         FileUtil.writeCSV(data, casesPath);
     }
 
+    @Test
+    public void crawlFromLocal() throws Exception {
+        File[] list = new File("C:\\ACCC_Cases\\").listFiles();
+        List<String[]> data = new ArrayList<>();
+
+        for (File file : list) {
+            if (file.isFile()) {
+                if (file.getName().endsWith(".html")) {
+                    Document doc = Jsoup.parse(file, "UTF-8");
+                    String[] item= getItem( doc);
+                    data.add(item);
+                }
+            }
+        }
+
+        FileUtil.writeCSV(data, "c:\\ACCC_Cases\\temp_cases.csv");
+    }
 }
