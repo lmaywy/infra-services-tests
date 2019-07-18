@@ -58,9 +58,9 @@ public class RestUtil {
     We send "path" as a parameter to the Rest Assured'a "get" method
     and "get" method returns response of API
     */
-    public static Response getResponse(String params) {
+    public static Response getResponse(String path) {
         //System.out.print("path: " + path +"\n");
-        return RestAssured.given().urlEncodingEnabled(false).get(params);
+        return RestAssured.given().urlEncodingEnabled(false).get(path);
     }
 
     public static Response getResponseWithToken(String userName, String password, String path) {
