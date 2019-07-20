@@ -12,8 +12,7 @@ import java.util.List;
 public class FileUtil {
     public static void saveAs(String content, String fileName, String ext)
             throws IOException {
-        String filePath = "c:\\ACCC_Cases\\";
-        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath + fileName + ext));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName + ext));
         writer.write(content);
         writer.close();
     }
