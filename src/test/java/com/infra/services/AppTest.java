@@ -3,7 +3,6 @@ package com.infra.services;
 import io.restassured.response.Response;
 import org.jsoup.select.Elements;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import utils.FileUtil;
 import utils.RestUtil;
 import org.jsoup.Jsoup;
@@ -24,7 +23,7 @@ public class AppTest {
 
     private String filePath = "c:\\ACCC_Cases\\case_links.csv";
     private String casesPath = "c:\\ACCC_Cases\\cases_%s.csv";
-    private String[] columns = new String[]{"title", "report date", "content", "Release number", "ACCC Infocentre", "Media enquiries", "Additional contacts", "Audience", "Topics"};
+    private String[] columns = new String[]{"title", "report date", "content", "Sub Links", "Release number", "ACCC Infocentre", "Media enquiries", "Additional contacts", "Audience", "Topics"};
     private String baseUrl = "https://www.accc.gov.au";
     private String rawHTMLPath = "c:\\ACCC_Cases\\Raw_HTML\\";
 
@@ -33,7 +32,6 @@ public class AppTest {
         String paraPage;
         List<String[]> caseLinks = new ArrayList<String[]>();
         int totalPage = 344;
-
 
         for (int i = 0; i < totalPage; i++) {
             paraPage = "?page=" + i;
@@ -59,7 +57,7 @@ public class AppTest {
         RestUtil.setBaseURI(baseUrl);
         caseLinks.size();
 
-        for (int j = 100; j < 500; j++) {
+        for (int j = 0; j < caseLinks.size(); j++) {
             String path = caseLinks.get(j)[0];
             Response article = RestUtil.getResponse(path);
 
@@ -78,12 +76,13 @@ public class AppTest {
         String content = ele.wholeText();
         String date = detail.getElementsByClass("date-display-single").get(0).text();
         String title = detail.getElementById("page-title").text();
+        String subLinks = String.join("\n",ele.select("a").eachAttr("href"));
 
         String[] item = new String[15];
         item[0] = title;
         item[1] = date;
         item[2] = content.replaceAll("(?m)^\\s*$(\\n|\\r\\n)", "").trim().replaceAll("  +", "");
-
+        item[3] = subLinks;
         Elements eleLabels = detail.select(".field-label");
 
         for (int k = 0; k < eleLabels.size(); k++) {
